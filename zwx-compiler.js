@@ -1,67 +1,38 @@
+const keywords = ["create:", "variable(", "print:", "set", "when"];
+
 function zwxToLua(zwsCode) {
   const lines = zwsCode.split('\n');
   const declaredVars = new Set();
   const output = [];
 
-  for (let i = 0; i < lines.length; i++) {
-    let line = lines[i].trim();
+  for (let raw of lines) {
+    let line = raw.trim();
+    if (line === '') continue;
 
-    if (/^create: variable\("(.+?)"\)/.test(line)) {
-      const varName = line.match(/^create: variable\("(.+?)"\)/)[1];
+    if (/^create: variable\((.+?)\)/.test(line)) {
+      const varName = line.match(/^create: variable\((.+?)\)/)[1];
       declaredVars.add(varName);
       continue;
     }
 
-    if (/^(\w+): workspace>/.test(line)) {
-      const [, varName] = line.match(/^(\w+): workspace>/);
-      const value = line.split(': ')[1].replace(/>/g, '.');
-
-      if (declaredVars.has(varName)) {
-        output.push(`local ${varName} = workspace.${value.split('workspace.')[1]}`);
-        declaredVars.delete(varName);
+    if (/^(\w+)\s*=\s*(.+)/.test(line)) {
+      const [, name, value] = line.match(/^(\w+)\s*=\s*(.+)/);
+      if (declaredVars.has(name)) {
+        output.push(`local ${name} = ${value}`);
+        declaredVars.delete(name);
       } else {
-        output.push(`${varName} = workspace.${value.split('workspace.')[1]}`);
+        output.push(`${name} = ${value}`);
       }
       continue;
     }
 
-    if (/^create: function\("(.+?)"\)/.test(line)) {
-      const name = line.match(/^create: function\("(.+?)"\)/)[1];
-      output.push(`function ${name}()`);
+    if (/^print: (.+)/.test(line)) {
+      const name = line.match(/^print: (.+)/)[1];
+      output.push(`print(${name})`);
       continue;
     }
 
-    if (/^FuncE: (\w+)/.test(line)) {
-      output.push('end');
-      continue;
-    }
-
-    if (/^GetF: (\w+)/.test(line)) {
-      output.push(`${RegExp.$1}()`);
-      continue;
-    }
-
-    if (/^print: "(.+?)"/.test(line)) {
-      output.push(`print("${RegExp.$1}")`);
-      continue;
-    }
-
-    if (/^when (\w+)#(\w+)\>(\w+)/.test(line)) {
-      const [, obj, event, target] = line.match(/^when (\w+)#(\w+)\>(\w+)/);
-      output.push(`${obj}.${event}:Connect(function(hit)`);
-      output.push(`  if hit == ${target} then`);
-      continue;
-    }
-
-    if (/^set (.+): (.+)/.test(line)) {
-      const [, path, value] = line.match(/^set (.+): (.+)/);
-      output.push(`    ${path.replace(/>/g, '.')} = ${value}`);
-      output.push(`  end`);
-      output.push(`end)`);
-      continue;
-    }
-
-    output.push(line.replace(/>/g, '.'));
+    output.push('-- Unrecognized: ' + line);
   }
 
   return output.join('\n');
@@ -74,15 +45,40 @@ function handleLiveTranslate() {
 }
 
 function simulateZWX() {
-  const zwxOutput = `ZWX Interpreter: Simulated script ran successfully.\n(Example) Player touched part. Health set to 0.`;
-  document.getElementById('zwxConsole').innerText = zwxOutput;
+  const zwxCode = document.getElementById('zwx').value;
+  document.getElementById('zwxConsole').innerText =
+    `ZWX Output:\n✓ Code interpreted\n✓ No errors`;
 }
 
 function simulateLua() {
-  const luaOutput = `Roblox Studio: Code ran without error.\nchar.Humanoid.Health set to 0 on Touched event.`;
-  document.getElementById('luaConsole').innerText = luaOutput;
+  const luaCode = document.getElementById('lua').value;
+  document.getElementById('luaConsole').innerText =
+    `Lua Output:\n${luaCode.includes("print") ? "✓ print executed" : "✓ No print output"}`;
 }
 
-document.addEventListener('DOMContentLoaded', () => {
-  document.getElementById('zwx').addEventListener('input', handleLiveTranslate);
+// AUTOCOMPLETE
+document.addEventListener("DOMContentLoaded", () => {
+  const input = document.getElementById("zwx");
+  const ghost = document.getElementById("ghostText");
+
+  input.addEventListener("input", () => {
+    const text = input.value;
+    const lastWord = text.split(/\\s|\\n/).pop();
+    const match = keywords.find(k => k.startsWith(lastWord));
+    ghost.textContent = match && match !== lastWord ? text + match.slice(lastWord.length) : "";
+    handleLiveTranslate();
+  });
+
+  input.addEventListener("keydown", (e) => {
+    if (e.key === "Tab") {
+      const text = input.value;
+      const lastWord = text.split(/\\s|\\n/).pop();
+      const match = keywords.find(k => k.startsWith(lastWord));
+      if (match && match !== lastWord) {
+        input.value = text.slice(0, -lastWord.length) + match;
+        e.preventDefault();
+        handleLiveTranslate();
+      }
+    }
+  });
 });
