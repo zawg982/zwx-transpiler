@@ -1,28 +1,41 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Secure Access - ZWX Translator</title>
-  <link rel="stylesheet" href="style.css" />
-  <script defer src="secure.js"></script>
+  <title>ZWX Translator</title>
+  <link rel="stylesheet" href="style.css">
+  <script src="zwx-compiler.js" defer></script>
+  <script src="secure.js" defer></script>
 </head>
 <body>
-  <div class="container">
-    <h1>Verify Yourself</h1>
-    <form id="verifyForm">
-      <label for="q1">Year you were born:</label>
-      <input type="text" id="q1" autocomplete="off" required /><br /><br />
+  <div id="lockscreen">
+    <div class="verify-box">
+      <h2>Verification</h2>
+      <input type="text" id="q1" placeholder="What year were you born?">
+      <input type="text" id="q2" placeholder="Favorite sport?">
+      <input type="text" id="q3" placeholder="Cat's name?">
+      <button onclick="verify()">Submit</button>
+    </div>
+  </div>
 
-      <label for="q2">Favorite sport:</label>
-      <input type="text" id="q2" autocomplete="off" required /><br /><br />
+  <div class="container" id="mainApp" style="display:none;">
+    <h1>ZWX → Roblox Lua</h1>
+    <p><a href="https://docs.google.com/document/d/17gpmMwrUgEbR_RlhRDfrsu0fza3-zZHrXVtjgPfBplQ/edit?tab=t.0" target="_blank">ZWX Syntax Documentation</a></p>
 
-      <label for="q3">Cat's name:</label>
-      <input type="text" id="q3" autocomplete="off" required /><br /><br />
+    <div class="editors">
+      <div class="editor-column">
+        <h3>ZWX Code</h3>
+        <textarea id="zwx" placeholder="Write ZWX here..."></textarea>
+        <button onclick="simulateZWX()">Run ZWX</button>
+        <div class="console" id="zwxConsole">ZWX Output will appear here</div>
+      </div>
 
-      <button type="submit">Verify</button>
-    </form>
-    <p id="status"></p>
+      <div class="editor-column">
+        <h3>Roblox Lua</h3>
+        <textarea id="lua" readonly></textarea>
+        <button onclick="simulateLua()">Run Lua</button>
+        <div class="console" id="luaConsole">Lua Output will appear here</div>
+      </div>
+    </div>
   </div>
 </body>
 </html>
