@@ -16,21 +16,29 @@
         href="https://docs.google.com/document/d/17gpmMwrUgEbR_RlhRDfrsu0fza3-zZHrXVtjgPfBplQ/edit?tab=t.0"
         target="_blank"
         rel="noopener noreferrer"
-        >ZWX Syntax Documentation</a
       >
+        ZWX Syntax Documentation
+      </a>
     </p>
-    <textarea
-      id="zwx"
-      placeholder="Write your ZWX code here..."
-      spellcheck="false"
-      autocomplete="off"
-    ></textarea>
-    <textarea
-      id="lua"
-      placeholder="Lua output will appear here..."
-      readonly
-      spellcheck="false"
-    ></textarea>
+
+    <div class="editors">
+      <div class="editor">
+        <h2>ZWX Code</h2>
+        <div class="editor-wrapper">
+          <textarea id="zwx" placeholder="Write your ZWX code here..." spellcheck="false" autocomplete="off"></textarea>
+          <div id="ghostText"></div>
+        </div>
+        <button onclick="simulateZWX()">Run ZWX</button>
+        <pre class="console" id="zwxConsole"></pre>
+      </div>
+
+      <div class="editor">
+        <h2>Lua Output</h2>
+        <textarea id="lua" readonly spellcheck="false"></textarea>
+        <button onclick="simulateLua()">Run Lua</button>
+        <pre class="console" id="luaConsole"></pre>
+      </div>
+    </div>
   </div>
 </body>
 </html>
