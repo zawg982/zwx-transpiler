@@ -1,33 +1,68 @@
 function zwxToLua(zwsCode) {
-  return zwsCode
-    // Variable creation
-    .replace(/create: variable\("(.+?)"\)/g, 'local $1')
-    // Variable assignment using workspace>
-    .replace(/^(\w+): workspace>(.+)$/gm, 'local $1 = workspace.$2'.replace(/>/g, '.'))
+  const lines = zwsCode.split('\n');
+  const declaredVars = new Set();
+  const output = [];
 
-    // Function creation
-    .replace(/create: function\("(.+?)"\)/g, 'function $1()')
-    .replace(/FuncE: (\w+)/g, 'end')
-    .replace(/GetF: (\w+)/g, '$1()')
+  for (let i = 0; i < lines.length; i++) {
+    let line = lines[i].trim();
 
-    // Print
-    .replace(/print: "(.+?)"/g, 'print("$1")')
+    if (/^create: variable\("(.+?)"\)/.test(line)) {
+      const varName = line.match(/^create: variable\("(.+?)"\)/)[1];
+      declaredVars.add(varName);
+      continue;
+    }
 
-    // Event connections (when A#Event>B)
-    .replace(/when (\w+)#(\w+)\>(\w+)/g, '$1.$2:Connect(function(hit)\n  if hit == $3 then')
+    if (/^(\w+): workspace>/.test(line)) {
+      const [, varName] = line.match(/^(\w+): workspace>/);
+      const value = line.split(': ')[1].replace(/>/g, '.');
 
-    // Set value (set A>B>C: D)
-    .replace(/set (.+): (.+)/g, '$1 = $2')
+      if (declaredVars.has(varName)) {
+        output.push(`local ${varName} = workspace.${value.split('workspace.')[1]}`);
+        declaredVars.delete(varName);
+      } else {
+        output.push(`${varName} = workspace.${value.split('workspace.')[1]}`);
+      }
+      continue;
+    }
 
-    // End auto-block (add end for when block)
-    .replace(/\b(set .+)/g, '  $1\nend') // indent 'set' inside 'when'
-    
-    // Replace > with . for any other remaining chains
-    .replace(/>/g, '.');
-}
+    if (/^create: function\("(.+?)"\)/.test(line)) {
+      const name = line.match(/^create: function\("(.+?)"\)/)[1];
+      output.push(`function ${name}()`);
+      continue;
+    }
 
-function handleTranslate() {
-  const input = document.getElementById('zwx').value;
-  const output = zwxToLua(input);
-  document.getElementById('lua').value = output;
+    if (/^FuncE: (\w+)/.test(line)) {
+      output.push('end');
+      continue;
+    }
+
+    if (/^GetF: (\w+)/.test(line)) {
+      output.push(`${RegExp.$1}()`);
+      continue;
+    }
+
+    if (/^print: "(.+?)"/.test(line)) {
+      output.push(`print("${RegExp.$1}")`);
+      continue;
+    }
+
+    if (/^when (\w+)#(\w+)\>(\w+)/.test(line)) {
+      const [, obj, event, target] = line.match(/^when (\w+)#(\w+)\>(\w+)/);
+      output.push(`${obj}.${event}:Connect(function(hit)`);
+      output.push(`  if hit == ${target} then`);
+      continue;
+    }
+
+    if (/^set (.+): (.+)/.test(line)) {
+      const [, path, value] = line.match(/^set (.+): (.+)/);
+      output.push(`    ${path.replace(/>/g, '.')} = ${value}`);
+      output.push(`  end`);
+      output.push(`end)`);
+      continue;
+    }
+
+    output.push(line.replace(/>/g, '.'));
+  }
+
+  return output.join('\n');
 }
