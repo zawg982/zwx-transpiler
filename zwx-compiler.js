@@ -67,14 +67,22 @@ function zwxToLua(zwsCode) {
   return output.join('\n');
 }
 
-function handleTranslate() {
-  const input = document.getElementById('zwx').value;
-  const output = zwxToLua(input);
-  document.getElementById('lua').value = output;
+function handleLiveTranslate() {
+  const zwx = document.getElementById('zwx').value;
+  const lua = zwxToLua(zwx);
+  document.getElementById('lua').value = lua;
 }
 
-window.addEventListener('DOMContentLoaded', () => {
-  const inputEl = document.getElementById('zwx');
-  inputEl.addEventListener('input', handleTranslate);
-  handleTranslate();
+function simulateZWX() {
+  const zwxOutput = `ZWX Interpreter: Simulated script ran successfully.\n(Example) Player touched part. Health set to 0.`;
+  document.getElementById('zwxConsole').innerText = zwxOutput;
+}
+
+function simulateLua() {
+  const luaOutput = `Roblox Studio: Code ran without error.\nchar.Humanoid.Health set to 0 on Touched event.`;
+  document.getElementById('luaConsole').innerText = luaOutput;
+}
+
+document.addEventListener('DOMContentLoaded', () => {
+  document.getElementById('zwx').addEventListener('input', handleLiveTranslate);
 });
