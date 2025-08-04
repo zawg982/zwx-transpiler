@@ -1,84 +1,32 @@
-const keywords = ["create:", "variable(", "print:", "set", "when"];
+const zwxInput = document.getElementById("zwx");
+const luaOutput = document.getElementById("lua");
+const zwxConsole = document.getElementById("zwxConsole");
+const luaConsole = document.getElementById("luaConsole");
 
-function zwxToLua(zwsCode) {
-  const lines = zwsCode.split('\n');
-  const declaredVars = new Set();
-  const output = [];
+zwxInput.addEventListener("input", () => {
+  const zwxCode = zwxInput.value;
+  const luaCode = translateZWX(zwxCode);
+  luaOutput.value = luaCode;
+});
 
-  for (let raw of lines) {
-    let line = raw.trim();
-    if (line === '') continue;
-
-    if (/^create: variable\((.+?)\)/.test(line)) {
-      const varName = line.match(/^create: variable\((.+?)\)/)[1];
-      declaredVars.add(varName);
-      continue;
-    }
-
-    if (/^(\w+)\s*=\s*(.+)/.test(line)) {
-      const [, name, value] = line.match(/^(\w+)\s*=\s*(.+)/);
-      if (declaredVars.has(name)) {
-        output.push(`local ${name} = ${value}`);
-        declaredVars.delete(name);
-      } else {
-        output.push(`${name} = ${value}`);
-      }
-      continue;
-    }
-
-    if (/^print: (.+)/.test(line)) {
-      const name = line.match(/^print: (.+)/)[1];
-      output.push(`print(${name})`);
-      continue;
-    }
-
-    output.push('-- Unrecognized: ' + line);
-  }
-
-  return output.join('\n');
-}
-
-function handleLiveTranslate() {
-  const zwx = document.getElementById('zwx').value;
-  const lua = zwxToLua(zwx);
-  document.getElementById('lua').value = lua;
+function translateZWX(zwxCode) {
+  return zwxCode
+    .replace(/create: variable\(([^)]+)\)/g, (_, name) => `local ${name}`)
+    .replace(/^(\w+):\s*"?([\w>.\"]+)"?/gm, (_, name, val) => `${name} = ${val.replace(/>/g, ".")}`)
+    .replace(/print: ([\w"]+)/g, (_, val) => `print(${val})`)
+    .replace(/when (.+?)#Touched>(\w+)/g, (_, a, b) => `${a}.Touched:Connect(function()\n  if ${b} then\n`)
+    .replace(/set (.+?): (.+)/g, (_, a, b) => `${a} = ${b}`)
+    .replace(/(function|FuncE|GetF):\s*(\w+)/g, (match, type, name) => {
+      if (type === "function") return `function ${name}()`;
+      if (type === "FuncE") return `end -- ${name}`;
+      if (type === "GetF") return `${name}()`;
+    });
 }
 
 function simulateZWX() {
-  const zwxCode = document.getElementById('zwx').value;
-  document.getElementById('zwxConsole').innerText =
-    `ZWX Output:\n✓ Code interpreted\n✓ No errors`;
+  zwxConsole.textContent = `ZWX Output:\n(✓) Simulated execution complete.`;
 }
 
 function simulateLua() {
-  const luaCode = document.getElementById('lua').value;
-  document.getElementById('luaConsole').innerText =
-    `Lua Output:\n${luaCode.includes("print") ? "✓ print executed" : "✓ No print output"}`;
+  luaConsole.textContent = `Lua Output:\n(✓) Roblox Studio simulation complete.`;
 }
-
-// AUTOCOMPLETE
-document.addEventListener("DOMContentLoaded", () => {
-  const input = document.getElementById("zwx");
-  const ghost = document.getElementById("ghostText");
-
-  input.addEventListener("input", () => {
-    const text = input.value;
-    const lastWord = text.split(/\\s|\\n/).pop();
-    const match = keywords.find(k => k.startsWith(lastWord));
-    ghost.textContent = match && match !== lastWord ? text + match.slice(lastWord.length) : "";
-    handleLiveTranslate();
-  });
-
-  input.addEventListener("keydown", (e) => {
-    if (e.key === "Tab") {
-      const text = input.value;
-      const lastWord = text.split(/\\s|\\n/).pop();
-      const match = keywords.find(k => k.startsWith(lastWord));
-      if (match && match !== lastWord) {
-        input.value = text.slice(0, -lastWord.length) + match;
-        e.preventDefault();
-        handleLiveTranslate();
-      }
-    }
-  });
-});
