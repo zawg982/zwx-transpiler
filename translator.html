@@ -12,31 +12,25 @@
     <h1>ZWX → Lua (Roblox)</h1>
     <p>
       Read the full
-      <a
-        href="https://docs.google.com/document/d/17gpmMwrUgEbR_RlhRDfrsu0fza3-zZHrXVtjgPfBplQ/edit?tab=t.0"
-        target="_blank"
-        rel="noopener noreferrer"
-      >
-        ZWX Syntax Documentation
+      <a href="https://docs.google.com/document/d/17gpmMwrUgEbR_RlhRDfrsu0fza3-zZHrXVtjgPfBplQ/edit?tab=t.0"
+         target="_blank" rel="noopener noreferrer">
+         ZWX Syntax Documentation
       </a>
     </p>
 
     <div class="editors">
-      <div class="editor">
+      <div class="panel">
         <h2>ZWX Code</h2>
-        <div class="editor-wrapper">
-          <textarea id="zwx" placeholder="Write your ZWX code here..." spellcheck="false" autocomplete="off"></textarea>
-          <div id="ghostText"></div>
-        </div>
+        <textarea id="zwx" placeholder="Write ZWX code..."></textarea>
         <button onclick="simulateZWX()">Run ZWX</button>
-        <pre class="console" id="zwxConsole"></pre>
+        <pre id="zwxConsole" class="console">ZWX Output:</pre>
       </div>
 
-      <div class="editor">
-        <h2>Lua Output</h2>
-        <textarea id="lua" readonly spellcheck="false"></textarea>
+      <div class="panel">
+        <h2>Roblox Lua</h2>
+        <textarea id="lua" readonly></textarea>
         <button onclick="simulateLua()">Run Lua</button>
-        <pre class="console" id="luaConsole"></pre>
+        <pre id="luaConsole" class="console">Lua Output:</pre>
       </div>
     </div>
   </div>
