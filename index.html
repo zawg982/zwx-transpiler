@@ -3,8 +3,8 @@
 <head>
   <title>ZWX Translator</title>
   <link rel="stylesheet" href="style.css">
-  <script src="zwx-compiler.js" defer></script>
   <script src="secure.js" defer></script>
+  <script src="zwx-compiler.js" defer></script>
 </head>
 <body>
   <div id="lockscreen">
@@ -17,23 +17,26 @@
     </div>
   </div>
 
-  <div class="container" id="mainApp" style="display:none;">
+  <div id="mainApp" style="display:none;">
     <h1>ZWX → Roblox Lua</h1>
-    <p><a href="https://docs.google.com/document/d/17gpmMwrUgEbR_RlhRDfrsu0fza3-zZHrXVtjgPfBplQ/edit?tab=t.0" target="_blank">ZWX Syntax Documentation</a></p>
+    <p><a href="https://docs.google.com/document/d/17gpmMwrUgEbR_RlhRDfrsu0fza3-zZHrXVtjgPfBplQ/edit?tab=t.0" target="_blank">ZWX Syntax Docs</a></p>
 
     <div class="editors">
-      <div class="editor-column">
-        <h3>ZWX Code</h3>
-        <textarea id="zwx" placeholder="Write ZWX here..."></textarea>
+      <div class="editor">
+        <h2>ZWX Code</h2>
+        <div class="editor-wrapper">
+          <textarea id="zwx" placeholder="Write ZWX code here..."></textarea>
+          <div id="ghostText"></div>
+        </div>
         <button onclick="simulateZWX()">Run ZWX</button>
-        <div class="console" id="zwxConsole">ZWX Output will appear here</div>
+        <pre class="console" id="zwxConsole"></pre>
       </div>
 
-      <div class="editor-column">
-        <h3>Roblox Lua</h3>
+      <div class="editor">
+        <h2>Roblox Lua</h2>
         <textarea id="lua" readonly></textarea>
         <button onclick="simulateLua()">Run Lua</button>
-        <div class="console" id="luaConsole">Lua Output will appear here</div>
+        <pre class="console" id="luaConsole"></pre>
       </div>
     </div>
   </div>
