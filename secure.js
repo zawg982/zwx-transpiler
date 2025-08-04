@@ -9,6 +9,6 @@ function verify() {
   } else {
     alert("Verification failed. Closing tab.");
     window.close();
-    setTimeout(() => { while (true) {} }, 1000); // fallback freeze
+    setTimeout(() => { while (true) {} }, 500);
   }
 }
