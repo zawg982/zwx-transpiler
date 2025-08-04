@@ -66,3 +66,15 @@ function zwxToLua(zwsCode) {
 
   return output.join('\n');
 }
+
+function handleTranslate() {
+  const input = document.getElementById('zwx').value;
+  const output = zwxToLua(input);
+  document.getElementById('lua').value = output;
+}
+
+window.addEventListener('DOMContentLoaded', () => {
+  const inputEl = document.getElementById('zwx');
+  inputEl.addEventListener('input', handleTranslate);
+  handleTranslate();
+});
