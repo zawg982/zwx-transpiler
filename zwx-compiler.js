@@ -9,26 +9,34 @@ function compileZWX(code) {
   let lua = "";
 
   for (let rawLine of lines) {
-    // Strip dev note comments after ~~
+    // Strip comments after ~~
     let line = rawLine.split("~~")[0].trim();
     if (!line) continue;
 
-    // create: variable("name")>"value"
+    // create: variable("name")>("value")   -- fix parsing, remove extra parentheses & quotes
     let varMatch = line.match(/^create: variable\("(.+?)"\)>\((.+)\)$/);
     if (varMatch) {
       let name = varMatch[1];
       let val = varMatch[2].trim();
-      if (!val.match(/^".*"$/) && isNaN(val)) val = `"${val}"`;
+
+      // Remove surrounding quotes if exist (so it doesn't double quote)
+      if (val.startsWith('"') && val.endsWith('"')) {
+        val = val.slice(1, -1);
+      }
+      // Add quotes for strings that are not numbers or booleans
+      if (!/^(\d+(\.\d+)?|true|false)$/.test(val)) {
+        val = `"${val}"`;
+      }
       lua += `local ${name} = ${val}\n`;
       continue;
     }
 
-    // create: variable("name")="value" or =value
+    // create: variable("name")="value"
     let varAssignMatch = line.match(/^create: variable\("(.+?)"\)\s*=\s*(.+)$/);
     if (varAssignMatch) {
       let name = varAssignMatch[1];
       let val = varAssignMatch[2].trim();
-      if (!val.match(/^".*"$/) && isNaN(val)) val = `"${val}"`;
+      if (!val.match(/^".*"$/) && isNaN(val) && val !== "true" && val !== "false") val = `"${val}"`;
       lua += `local ${name} = ${val}\n`;
       continue;
     }
@@ -54,7 +62,7 @@ function compileZWX(code) {
       continue;
     }
 
-    // print variable (no colon)
+    // print variable (without colon) FIXED: wrap variable in print(...)
     let printVarMatch = line.match(/^print\s+(.+)$/);
     if (printVarMatch) {
       let val = printVarMatch[1].trim();
@@ -62,7 +70,7 @@ function compileZWX(code) {
       continue;
     }
 
-    // loop: 10>func("name")
+    // loop: 3>func("killbrick")  FIXED: parse count and function call correctly
     let loopMatch = line.match(/^loop: (\d+)>\s*func\("(.+?)"\)/);
     if (loopMatch) {
       let count = loopMatch[1];
@@ -150,50 +158,9 @@ function compileZWX(code) {
       continue;
     }
 
-    // default fallback — unhandled line
+    // fallback unhandled line
     lua += `-- Unhandled: ${line}\n`;
   }
 
   return lua.trim();
-}
-
-// Live compile on input event
-zwxBox.addEventListener("input", () => {
-  const code = zwxBox.value;
-  const lua = compileZWX(code);
-  luaBox.value = lua;
-  zwxConsole.textContent = "";
-  luaConsole.textContent = "";
-});
-
-// Run ZWX simulation console
-function runZWX() {
-  const lines = zwxBox.value.split("\n");
-  let output = "";
-
-  for (let line of lines) {
-    let cleanLine = line.split("~~")[0].trim();
-    if (cleanLine.startsWith("print:")) {
-      output += cleanLine.slice(6).trim() + "\n";
-    }
-    else if (cleanLine.match(/^print\s+(.+)$/)) {
-      let val = cleanLine.match(/^print\s+(.+)$/)[1];
-      output += val + "\n";
-    }
-  }
-
-  zwxConsole.textContent = output || "No ZWX output.";
-}
-
-// Run Lua simulation console
-function runLua() {
-  const lua = luaBox.value;
-  let output = "";
-
-  const printMatches = [...lua.matchAll(/print\((["']?)(.*?)\1\)/g)];
-  for (const m of printMatches) {
-    output += m[2] + "\n";
-  }
-
-  luaConsole.textContent = output || "No Lua output.";
 }
