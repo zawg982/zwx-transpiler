@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>ZWX to Lua Translator</title>
+  <link rel="stylesheet" href="style.css" />
+  <script defer src="zwx-compiler.js"></script>
+</head>
+<body>
+  <div class="container">
+    <h1>ZWX → Lua (Roblox)</h1>
+    <p>
+      Read the full
+      <a
+        href="https://docs.google.com/document/d/17gpmMwrUgEbR_RlhRDfrsu0fza3-zZHrXVtjgPfBplQ/edit?tab=t.0"
+        target="_blank"
+        rel="noopener noreferrer"
+        >ZWX Syntax Documentation</a
+      >
+    </p>
+    <textarea
+      id="zwx"
+      placeholder="Write your ZWX code here..."
+      spellcheck="false"
+      autocomplete="off"
+    ></textarea>
+    <textarea
+      id="lua"
+      placeholder="Lua output will appear here..."
+      readonly
+      spellcheck="false"
+    ></textarea>
+  </div>
+</body>
+</html>
