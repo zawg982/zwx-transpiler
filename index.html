@@ -1,17 +1,28 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-  <title>ZWX to Lua Translator</title>
-  <link rel="stylesheet" href="style.css">
-  <script src="zwx-compiler.js" defer></script>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Secure Access - ZWX Translator</title>
+  <link rel="stylesheet" href="style.css" />
+  <script defer src="secure.js"></script>
 </head>
 <body>
   <div class="container">
-    <h1>ZWX → Lua (Roblox)</h1>
-    <p>Read the full <a href="https://docs.google.com/document/d/17gpmMwrUgEbR_RlhRDfrsu0fza3-zZHrXVtjgPfBplQ/edit?tab=t.0" target="_blank" rel="noopener noreferrer">ZWX Syntax Documentation</a></p>
-    <textarea id="zwx" placeholder="Write your ZWX code here..."></textarea>
-    <button onclick="handleTranslate()">Translate</button>
-    <textarea id="lua" placeholder="Lua output will appear here..." readonly></textarea>
+    <h1>Verify Yourself</h1>
+    <form id="verifyForm">
+      <label for="q1">Year you were born:</label>
+      <input type="text" id="q1" autocomplete="off" required /><br /><br />
+
+      <label for="q2">Favorite sport:</label>
+      <input type="text" id="q2" autocomplete="off" required /><br /><br />
+
+      <label for="q3">Cat's name:</label>
+      <input type="text" id="q3" autocomplete="off" required /><br /><br />
+
+      <button type="submit">Verify</button>
+    </form>
+    <p id="status"></p>
   </div>
 </body>
 </html>
